@@ -10,10 +10,9 @@
 - 共有ワーカー (shared worker)
 - サービスワーカー
 
-// Module Service Worker になる
-navigator.serviceWorker.register('/sw.js', {type: 'module'})
-// Classic Service Worker になる
-navigator.serviceWorker.register('/sw.js')
+Module or Classic
+- navigator.serviceWorker.register('/sw.js', {type: 'module'}) // module
+- navigator.serviceWorker.register('/sw.js') // classic
 
 制限
 - DOM操作
