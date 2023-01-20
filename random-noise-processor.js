@@ -3,7 +3,7 @@ class RandomNoiseProcessor extends AudioWorkletProcessor {
     super();
     this.voldefault = 0.01;
     this.vol = this.voldefault;
-    this.port.onmessage = e => this.handleMessage(e);
+    this.port.onmessage = e => this.vol = e.data.vol;
   }
   process(inputs, outputs, parameters) {
     const chlen = outputs.length;
@@ -15,9 +15,6 @@ class RandomNoiseProcessor extends AudioWorkletProcessor {
       }
     }
     return true;
-  }
-  handleMessage(e) {
-    this.vol = e.data.vol;
   }
 }
 
