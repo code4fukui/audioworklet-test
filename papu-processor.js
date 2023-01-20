@@ -13,8 +13,6 @@ class PAPUProcessor extends AudioWorkletProcessor {
     this.audio_write_cursor = 0;
     this.audio_read_cursor = 0;
 
-    //const sampleRate = 44100;
-    const sampleRate = 48000;
     const nes = {
       opts: {
         sampleRate,
