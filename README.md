@@ -1,3 +1,8 @@
+# AudioWorklet test
+
+- [シンプルなノイズ音](https://code4fukui.github.io/audioworklet-test/noise.html)
+- [PAPU音源テスト](https://code4fukui.github.io/audioworklet-test/papu.html)
+
 ## reference
 
 - [AudioWorkletの導入 - Qiita](https://qiita.com/ryoyakawai/items/1160586653330ccbf4a4)
