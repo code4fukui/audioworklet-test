@@ -6,6 +6,8 @@
 <button id=btn>START</button>
 <br>
 <input type=range id=range min=0 max=100 value=10>
+<hr>
+<a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
 
 <script type="module">
 
@@ -32,3 +34,16 @@ btn.onclick = async () => {
   range.onchange = () => node.setVolume(range.value / 1000);
 };
 </script>
+
+<style>
+body {
+  margin: 1.5em;
+}
+input {
+  width: 50vw;
+}
+a {
+  color: gray !important;
+}
+</style>
+  
