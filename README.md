@@ -1,3 +1,8 @@
+# AudioWorklet test
+
+- [シンプルなノイズ音](https://code4fukui.github.io/audioworklet-test/noise.html)
+- [PAPU音源テスト](https://code4fukui.github.io/audioworklet-test/papu.html) with [PAPU.js](https://github.com/taisukef/jsnes/blob/master/src/papu.js) from [JSNES](https://github.com/taisukef/jsnes)
+
 ## reference
 
 - [AudioWorkletの導入 - Qiita](https://qiita.com/ryoyakawai/items/1160586653330ccbf4a4)
@@ -10,10 +15,9 @@
 - 共有ワーカー (shared worker)
 - サービスワーカー
 
-// Module Service Worker になる
-navigator.serviceWorker.register('/sw.js', {type: 'module'})
-// Classic Service Worker になる
-navigator.serviceWorker.register('/sw.js')
+Module or Classic
+- navigator.serviceWorker.register('/sw.js', {type: 'module'}) // module
+- navigator.serviceWorker.register('/sw.js') // classic
 
 制限
 - DOM操作
