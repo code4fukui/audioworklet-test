@@ -7,6 +7,7 @@
 <br>
 <br>
 <button id=btn1>Sound Effect</button><br>
+<button id=btn4>Sound Effect 2</button><br>
 <button id=btn2>Triangle Wave</button><br>
 <button id=btn3>Play MML</button><input id=inmml value="CDE2CDE2GEDCDED2 GGEGAAG2EEDDC2"><br>
 <hr>
@@ -133,6 +134,16 @@ btn.onclick = async () => {
         break;
       se1set3(1, p.freq);
       await sleep(p.len);
+    }
+  };
+
+  btn4.onclick = () => {
+    // 10 POKE &H4015,3
+    // 20 POKE &H4000,&HB8,&HAF,255,3,&HB8,&HAF,252,3
+    papu.writeReg(0x4015, 3); // sound init
+    const data = [0xb8, 0xaf, 255, 3, 0xb8, 0xaf, 252, 3];
+    for (let i = 0; i < data.length; i++) {
+      papu.writeReg(0x4000 + i, data[i]);
     }
   };
 };
