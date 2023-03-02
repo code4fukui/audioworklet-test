@@ -1,0 +1,213 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>PAPU Sound MIDI Player Test with AudioWorkletProcessor</title>
+</head><body>
+<h1>PAPU Sound MIDI Player Test with AudioWorkletProcessor</h1>
+
+<button id=btn>play MIDI</button>
+<br>
+<!--
+<button id=btn1>Sound Effect</button><br>
+<button id=btn2>Triangle Wave</button><br>
+<button id=btn3>Play MML</button><input id=inmml value="CDE2CDE2GEDCDED2 GGEGAAG2EEDDC2"><br>
+-->
+<hr>
+music: <a href=https://github.com/code4fukui/music-future-with-you/>福井県 新幹線開業ウェルカムダンス 「君と描く未来へと」from'君が最高に輝くように'</a><br>
+<a href=https://ja.wikipedia.org/wiki/Programmable_Sound_Generator>PAPU</a> by <a href=https://github.com/taisukef/jsnes/>JSNES</a><br>
+<a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
+
+<script type="module">
+import { sleep } from "https://js.sabae.cc/sleep.js";
+//import { MML } from "https://code4fukui.github.io/audioworklet-test/MML.js";
+import { MidiParser } from "https://code4fukui.github.io/midi-parser-js/src/midi-parser.js";
+
+//const midiurl = "https://code4fukui.github.io/midi-parser-js/test/test.mid";
+const midiurl = "https://code4fukui.github.io/music-future-with-you/kimito-kagayaku-miraiheto_melody.mid";
+
+btn.onclick = async () => {
+  //const sampleRate = 44100;
+  const sampleRate = 48000; // mac default
+  const context = new AudioContext({ sampleRate });
+  console.log(context);
+
+  // PAPU
+  await context.audioWorklet.addModule("https://code4fukui.github.io/audioworklet-test/papu-processor.js");
+  class PAPUNode extends AudioWorkletNode {
+    constructor(context) {
+      super(context, "papu-processor");
+    }
+    writeReg(addr, value) {
+      this.port.postMessage({ addr, value });
+    }
+  };
+  const papu = new PAPUNode(context);
+  papu.connect(context.destination);
+
+  /*
+  btn1.onclick = () => {
+		papu.writeReg(0x4015, 0b00001111); // sound init
+
+		papu.writeReg(0x400C, 0b00011111); // SE1
+		papu.writeReg(0x400E, 0b00001010);
+		papu.writeReg(0x400F, 0b00111000);
+		papu.writeReg(0x4004, 0b10111111); // SE2
+		papu.writeReg(0x4005, 0b11110010);
+		papu.writeReg(0x4006, 0b01101000);
+		papu.writeReg(0x4007, 0b10001010);
+  };
+  */
+  const bin = new Uint8Array(await (await fetch(midiurl)).arrayBuffer());
+  const midi = MidiParser.parse(bin);
+  console.log(midi);
+
+      /*
+  参考
+    NES on FPGA APU
+    https://pgate1.at-ninja.jp/NES_on_FPGA/nes_apu.htm
+  
+  ; play SE1 (矩形波1)
+  ;     DDLCVVVV (DD=duty(00: 87.5%, 01: 75%, 10: 50%, 11: 25%), L=再生時間カウンタ(5bit) 0:on, C=volume fix 0:on, VVVV=volume)
+  lda #%10101111
+  sta $4000
+  ;   #%EPPPSSSS (E=sweeve, PPP=length, SSSS=shift)
+  lda #%00000000
+  sta $4001
+  ; CPUのクロック周波数 / (再生周波数 * 32) - 1
+  ; clock = 1.789773MHz = 1789773Hz, 440Hz ラ, 1789773/(440*32)-1 = 126.11
+  ; clock = 1.789773MHz = 1789773Hz, 220Hz ラ, 1789773/(220*32)-1 = 253.23
+  ; clock = 1.789773MHz = 1789773Hz, 110Hz ラ, 1789773/(110*32)-1 = 507.45
+  ;   #%TTTTTTTT T下位8bit
+  lda #%00000000
+  sta $4002 ; サウンドレジスタ
+  ;   #%LLLLLTTT 長さL, T上位3bit
+  lda #%00001001
+  sta $4003 ; サウンドレジスタ
+  rts
+  */
+  const DUTY_87 = 0;
+  const DUTY_75 = 1;
+  const DUTY_50 = 2;
+  const DUTY_25 = 3;
+  const se1set1 = (duty, lenflg, volfixflg, vol) => {
+    papu.writeReg(0x4000, (duty << 6) | (lenflg << 5) | (volfixflg << 4) | vol);
+  };
+  const se1set2 = (sweeveflg, len, shift) => {
+    papu.writeReg(0x4001, (sweeveflg << 7) | (len << 4) | shift);
+  };
+  const LEN_TABLE = [0x0A, 0x14, 0x28, 0x50, 0xA0, 0x3C, 0x0E, 0x1A, 0x0C, 0x18, 0x30, 0x60, 0xC0, 0x48, 0x10, 0x20, 0xFE, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E];
+  const nearLen = (len) => {
+    let near = 16; // 0xfe
+    for (let i = 0; i < LEN_TABLE.length; i++) {
+      const t = LEN_TABLE[i];
+      if (t == len) {
+        return i;
+      }
+      if (t < len) {
+        near = i;
+      }
+    }
+    return near;
+  };
+  const se1set3 = (len, hz) => {
+    const t = 1789773 / (hz * 32) - 1 >> 0;
+    const len2 = nearLen(len);
+    //console.log(len, LEN_TABLE[len2]);
+    papu.writeReg(0x4002, t & 0xff);
+    papu.writeReg(0x4003, (len2 << 3) | (t >> 8));
+  };
+
+  //
+
+   /*
+  
+  ; play SE2 (矩形波2)
+  ;     ddcevvvv (d=duty, c=再生時間カウンタ, e=effect, v=volume)
+  lda #%10111111
+  sta $4004
+  ;     csssmrrr (c=周波数変化, s=speed, m=method, r=range)
+  lda #%11110010
+  sta $4005
+  ;     kkkkkkkk (k=音程周波数の下位8bit)
+  lda #%01101000
+  sta $4006
+  ;     tttttkkk (t=再生時間, k=音程周波数の上位3bit)
+  lda #%10001010
+  sta $4007
+  
+    ; play SE1 (ノイズ)
+  ;     --cevvvv (c=再生時間カウンタ, e=effect, v=volume)
+  lda #%00011111
+  sta $400C
+  ;     r---ssss (r=乱数種別, s=サンプリングレート)
+  lda #%00001010
+  sta $400E
+  ;     ttttt--- (t=再生時間)
+  lda #%00111000
+  sta $400F
+    */
+  const test = () => {
+		papu.writeReg(0x4015, 0b00001111); // sound init
+
+    se1set1(DUTY_50, 0, 0, 5);
+    //se1set2(1, 7, 0);
+    se1set3(1, 440 * 2);
+  };
+
+  const play = async () => {
+		papu.writeReg(0x4015, 0b00001111); // sound init
+    se1set1(DUTY_50, 0, 0, 5);
+
+    const tempo = midi.timeDivision;
+    const division = 1;
+    const ntrack = 0;
+    const track = midi.track[ntrack].event;
+    for (let i = 0; i < track.length; i++) {
+      const e = track[i];
+      // Note On	0x9	note number	velocity
+      const note = e.data[0]; // note number
+      let nextnote;
+      let len = 0;
+      for (let j = i + 1; j < track.length; j++) {
+        const e2 = track[j];
+        len += e2.deltaTime;
+        if (e2.type == 8 && e2.data[0] == note || e2.type == 9 && e2.data[0] == note && e2.data[1] == 0) {
+          break;
+        }
+      }
+      const vol = e.data[1]; // volume
+      const freq = 440 * Math.pow(2, (note - 69) / 12);
+      const deltams = e.deltaTime * (600 / tempo);
+      //const deltams = e.deltaTime * (1000.0 * (60.0 / ((MICROSECONDS_PER_MINUTE / tempo) * division))) * 100;
+      if (e.type == 9 && vol > 0) {
+        console.log("on", freq, vol, deltams, len);
+        se1set3(len / 50, freq);
+      }
+      await sleep(deltams);
+    }
+  };
+  /*
+  btn3.onclick = async () => {
+    play();
+  };
+  */
+  play();
+};
+
+</script>
+
+<style>
+body {
+  margin: 3em;
+  text-align: center;
+}
+input {
+  width: 50vw;
+}
+button {
+  padding: 1em;
+  margin: 1em;
+  font-size: 150%;
+}
+a {
+  color: gray !important;
+}
+</style>
