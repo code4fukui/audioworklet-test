@@ -3,36 +3,38 @@
 </head><body>
 <h1>Noise Sound Test with AudioWorkletProcessor</h1>
 
-<button id=btn>START</button>
+<button id=btnstart>START</button>
+<button id=btnstop>STOP</button>
 <br>
 <input type=range id=range min=0 max=100 value=10>
 <hr>
 <a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
 
 <script type="module">
+import { RandomNoiseNode } from "./RandomNoiseNode.js";
 
-btn.onclick = async () => {
+let context = null;
+
+const start = async () => {
+  await stop();
   const sampleRate = 48000; // mac default
-  const context = new AudioContext({ sampleRate });
+  context = new AudioContext({ sampleRate });
   console.log(context);
 
-  // Random Noise
-  await context.audioWorklet.addModule("random-noise-processor.js");
-  class RandomNoiseNode extends AudioWorkletNode {
-    constructor(context) {
-      super(context, "random-noise-processor");
-    }
-    setVolume(vol) {
-      this.port.postMessage({
-        vol,
-      });
-    }
-  };
-  const node = new RandomNoiseNode(context);
+  const node = await RandomNoiseNode.create(context);
   node.connect(context.destination);
 
-  range.onchange = () => node.setVolume(range.value / 1000);
+  range.oninput = () => node.setVolume(range.value / 100);
+  range.oninput();
 };
+const stop = async () => {
+  if (!context) return;
+  await context.close();
+  context = null;
+};
+
+btnstart.onclick = start;
+btnstop.onclick = stop;
 </script>
 
 <style>

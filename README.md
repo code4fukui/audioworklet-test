@@ -1,5 +1,6 @@
 # AudioWorklet test
 
+- [シンプルなビープ音](https://code4fukui.github.io/audioworklet-test/beep.html)
 - [シンプルなノイズ音](https://code4fukui.github.io/audioworklet-test/noise.html)
 - [PAPU音源テスト](https://code4fukui.github.io/audioworklet-test/papu.html) with [PAPU.js](https://github.com/taisukef/jsnes/blob/master/src/papu.js) from [JSNES](https://github.com/taisukef/jsnes)
 

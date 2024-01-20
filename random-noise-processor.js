@@ -6,12 +6,13 @@ class RandomNoiseProcessor extends AudioWorkletProcessor {
     this.port.onmessage = e => this.vol = e.data.vol;
   }
   process(inputs, outputs, parameters) {
-    const chlen = outputs.length;
-    for (let j = 0; j < chlen; j++) {
-      const channel = outputs[j][0];
-      const len = channel.length;
-      for (let i = 0; i < len; i++) {
-        channel[i] = (Math.random() * 2 - 1) * this.vol;
+    const output = outputs[0];
+    const chlen = output.length;
+    const len = output[0].length;
+    for (let i = 0; i < len; i++) {
+      for (let j = 0; j < chlen; j++) {
+        const vol = (Math.random() * 2 - 1) * this.vol;
+        output[j][i] = vol;
       }
     }
     return true;

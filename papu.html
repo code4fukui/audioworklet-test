@@ -3,7 +3,8 @@
 </head><body>
 <h1>PAPU Sound Test with AudioWorkletProcessor</h1>
 
-<button id=btn>START Sound Engine</button>
+<button id=btnstart>START</button>
+<button id=btnstop>STOP</button>
 <br>
 <br>
 <button id=btn1>Sound Effect</button><br>
@@ -18,24 +19,19 @@
 <script type="module">
 import { sleep } from "https://js.sabae.cc/sleep.js";
 import { MML } from "./MML.js";
+import { PAPUNode } from "./PAPUNode.js";
 
-btn.onclick = async () => {
+let context;
+
+const start = async () => {
+  stop();
   //const sampleRate = 44100;
   const sampleRate = 48000; // mac default
-  const context = new AudioContext({ sampleRate });
+  context = new AudioContext({ sampleRate });
   console.log(context);
 
   // PAPU
-  await context.audioWorklet.addModule("papu-processor.js");
-  class PAPUNode extends AudioWorkletNode {
-    constructor(context) {
-      super(context, "papu-processor");
-    }
-    writeReg(addr, value) {
-      this.port.postMessage({ addr, value });
-    }
-  };
-  const papu = new PAPUNode(context);
+  const papu = await PAPUNode.create(context);
   papu.connect(context.destination);
   btn1.onclick = () => {
 		papu.writeReg(0x4015, 0b00001111); // sound init
@@ -70,20 +66,20 @@ btn.onclick = async () => {
   rts
   */
   const DUTY_87 = 0;
-    const DUTY_75 = 1;
-    const DUTY_50 = 2;
-    const DUTY_25 = 3;
-    const se1set1 = (duty, lenflg, volfixflg, vol) => {
-      papu.writeReg(0x4000, (duty << 6) | (lenflg << 5) | (volfixflg << 4) | vol);
-    };
-    const se1set2 = (sweeveflg, len, shift) => {
-      papu.writeReg(0x4001, (sweeveflg << 7) | (len << 4) | shift);
-    };
-    const se1set3 = (len, hz) => {
-      const t = 1789773 / (hz * 32) - 1 >> 0;
-      papu.writeReg(0x4002, t & 0xff);
-      papu.writeReg(0x4003, (len << 3) | (t >> 8));
-    };
+  const DUTY_75 = 1;
+  const DUTY_50 = 2;
+  const DUTY_25 = 3;
+  const se1set1 = (duty, lenflg, volfixflg, vol) => {
+    papu.writeReg(0x4000, (duty << 6) | (lenflg << 5) | (volfixflg << 4) | vol);
+  };
+  const se1set2 = (sweeveflg, len, shift) => {
+    papu.writeReg(0x4001, (sweeveflg << 7) | (len << 4) | shift);
+  };
+  const se1set3 = (len, hz) => {
+    const t = 1789773 / (hz * 32) - 1 >> 0;
+    papu.writeReg(0x4002, t & 0xff);
+    papu.writeReg(0x4003, (len << 3) | (t >> 8));
+  };
 
   //
   btn2.onclick = () => {
@@ -147,6 +143,15 @@ btn.onclick = async () => {
     }
   };
 };
+
+const stop = async () => {
+  if (!context) return;
+  await context.close();
+  context = null;
+};
+
+btnstart.onclick = start;
+btnstop.onclick = stop;
 
 </script>
 
