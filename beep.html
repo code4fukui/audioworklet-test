@@ -27,7 +27,7 @@ const start = async () => {
   const node = await BeepNode.create(context);
   node.connect(context.destination);
 
-  range.oninput = () => node.setVolume(range.value / 1000);
+  range.oninput = () => node.setVolume(range.value / 100);
   range2.oninput = () => node.setFreq(range2.value);
   range.oninput();
   range2.oninput();
