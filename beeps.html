@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>Beeps Sound Test with AudioWorkletProcessor</title>
+</head><body>
+<h1>Beeps Sound Test with AudioWorkletProcessor</h1>
+
+<button id=btnstart>START</button>
+<button id=btnstop>STOP</button>
+<br>
+<span class=label>VOL</span><input type=range id=range min=0 max=100 value=10><br>
+<span class=label>FREQ</span><input type=range id=range2a min=0 max=1000 value=440 step=0.1><br>
+<span class=label>FREQ</span><input type=range id=range2b min=0 max=1000 value=440 step=0.1><br>
+<span class=label>FREQ</span><input type=range id=range2c min=0 max=1000 value=440 step=0.1><br>
+<hr>
+<a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
+
+<script type="module">
+import { BeepsNode } from "./BeepsNode.js";
+
+let context;
+
+const start = async () => {
+  if (context) {
+    await stop();
+  }
+  const sampleRate = 48000; // mac default
+  context = new AudioContext({ sampleRate });
+  console.log(context);
+
+  const node = await BeepsNode.create(context);
+  node.connect(context.destination);
+  console.log(node);
+
+  range.oninput = () => {
+    for (let i = 0; i < 3; i++) {
+      node.setVolume(i, range.value / 1000);
+    }
+  };
+  range2a.oninput = () => node.setFreq(0, range2a.value);
+  range2b.oninput = () => node.setFreq(1, range2b.value);
+  range2c.oninput = () => node.setFreq(2, range2c.value);
+  range.oninput();
+  range2a.oninput();
+  range2b.oninput();
+  range2c.oninput();
+};
+const stop = async () => {
+  if (!context) return;
+  await context.close();
+  context = null;
+};
+
+btnstart.onclick = start;
+btnstop.onclick = stop;
+</script>
+
+<style>
+body {
+  margin: 1.5em;
+}
+.label {
+  display: inline-block;
+  width: 3.5em;
+}
+button {
+  margin-bottom: 1em;
+}
+input {
+  width: 80vw;
+}
+a {
+  color: gray !important;
+}
+</style>
