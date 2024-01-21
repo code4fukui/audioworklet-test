@@ -12,19 +12,20 @@
 
 ## doc
 
-ワーカー
-- 専用ワーカー (dedicated worker)
-- 共有ワーカー (shared worker)
-- サービスワーカー
+Worker ワーカー
+- 専用ワーカー (Dedicated Worker)
+- 共有ワーカー (Shared Worker)
+- サービスワーカー (Service Worker)
+- オーディオワーカー (Audio Worker)
 
 Module or Classic
-- navigator.serviceWorker.register('/sw.js', {type: 'module'}) // module
+- navigator.serviceWorker.register('/sw.js', { type: 'module' }) // module
 - navigator.serviceWorker.register('/sw.js') // classic
 
 制限
-- DOM操作
+- DOM操作不可
 - window オブジェクトの既定のメソッドやプロパティに一部制限
-- Dynamic Import は使えない
+- Dynamic Import不可
 
 通信
 - メッセージのシステム（postMessage）を使う
