@@ -4,6 +4,7 @@
 - [シンプルなノイズ音](https://code4fukui.github.io/audioworklet-test/noise.html)
 - [PAPU音源テスト](https://code4fukui.github.io/audioworklet-test/papu.html) with [PAPU.js](https://github.com/taisukef/jsnes/blob/master/src/papu.js) from [JSNES](https://github.com/taisukef/jsnes)
 - [IchigoJam MML](https://code4fukui.github.io/audioworklet-test/mml.html)
+- [サイン波](https://code4fukui.github.io/audioworklet-test/sine.html)
 
 ## reference
 

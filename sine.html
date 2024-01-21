@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Sine Wave Sound Test with AudioWorkletProcessor</title>
+</head><body>
+<h1>Sine Wave Sound Test with AudioWorkletProcessor</h1>
+
+<button id=btnstart>START</button>
+<button id=btnstop>STOP</button>
+<br>
+<span class=label>VOL</span><span class=label id=spanvol></span><input type=range id=range min=0 max=100 value=10><br>
+<span class=label>FREQ</span><span class=label id=spanfreq></span><input type=range id=range2 min=0 max=15000 value=440 step=1><br>
+<hr>
+<a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
+
+<script type="module">
+import { SineNode } from "./SineNode.js";
+
+let context;
+
+const start = async () => {
+  if (context) {
+    await stop();
+  }
+  const sampleRate = 48000; // mac default
+  context = new AudioContext({ sampleRate });
+  console.log(context);
+
+  const node = await SineNode.create(context);
+  node.connect(context.destination);
+
+  range.oninput = () => {
+    const vol = range.value / 100;
+    spanvol.textContent = vol;
+    node.setVolume(vol);
+  };
+  range2.oninput = () => {
+    const freq = range2.value;
+    spanfreq.textContent = freq + "Hz";
+    node.setFreq(freq);
+  };
+  range.oninput();
+  range2.oninput();
+};
+const stop = async () => {
+  if (!context) return;
+  await context.close();
+  context = null;
+};
+
+btnstart.onclick = start;
+btnstop.onclick = stop;
+</script>
+
+<style>
+body {
+  margin: 1.5em;
+}
+.label {
+  display: inline-block;
+  width: 4em;
+}
+button {
+  margin-bottom: 1em;
+}
+input {
+  width: 70vw;
+}
+a {
+  color: gray !important;
+}
+</style>
