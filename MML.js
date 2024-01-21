@@ -1,5 +1,8 @@
 export class MML {
   constructor(mml) {
+    this.setMML(mml);
+  }
+  setMML(mml) {
     this.mml = mml;
     this.nmml = 0;
     this.oct = 4;
@@ -9,19 +12,25 @@ export class MML {
   }
   getFreqLen() {
     const mml = this.mml;
+    if (!mml) return null;
 
     let n = -2;
     let l = 8;
     let rest = false;
+    let loopflg = false;
     for (;;) {
-      if (mml.length == this.nmml) {
+      const c = mml.substring(this.nmml, this.nmml + 1).toUpperCase();
+      if (mml.length == this.nmml || c == "'") {
         if (this.nrepeat >= 0) {
           this.nmml = this.nrepeat;
+          if (loopflg) {
+            return null;
+          }
+          loopflg = true;
           continue;
         }
         return null;
       }
-      const c = mml.substring(this.nmml, this.nmml + 1).toUpperCase();
       this.nmml++;
       if (c == " ") {
         continue;
@@ -58,6 +67,14 @@ export class MML {
         this.nrepeat = this.nmml;
         continue;
       }
+      if (c == "N") {
+        const c2 = mml.substring(this.nmml);
+        const n = parseInt(c2);
+        l = 32 / this.deflen;
+        const len = (60 * 1000) / (this.t * 8) * l;
+        const freq = (60 * 261) / n / 2;
+        return { freq, len };
+      }
       n = "C D EF G A BR".indexOf(c);
       if (n < 0) continue;
       if (n == 12) rest = true;
@@ -92,7 +109,7 @@ export class MML {
         }
       }
       if (n >= 0) {
-        n += 3 + (this.oct - 4) * 12;
+        n += 3 + (this.oct - 6) * 12;
       }
       break;
     }

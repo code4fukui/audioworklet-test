@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>MML Beep Sound Test with AudioWorkletProcessor</title>
+</head><body>
+<h1>MML Beep Sound Test with AudioWorkletProcessor</h1>
+
+<button id=btnstart>START</button>
+<button id=btnstop>STOP</button>
+<br>
+<span class=label>VOL</span><input type=range id=range min=0 max=100 value=50><br>
+<span class=label>MML</span><input type=text id=inmml value="T200CDE2CDE2GEDCDED2 CDE2CDE2GEDCDEC2 GGEGAAG2EEDDC2"><br>
+<hr>
+
+MML: <a href=https://fukuno.jig.jp/app/csv/ichigojam-cmd.html#PLAY>IchigoJam MML</a><br>
+<a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
+
+<script type="module">
+import { MMLBeepNode } from "./MMLBeepNode.js";
+
+let context;
+
+const start = async () => {
+  if (context) {
+    await stop();
+  }
+  const sampleRate = 48000; // mac default
+  context = new AudioContext({ sampleRate });
+  console.log(context);
+
+  const node = await MMLBeepNode.create(context);
+  node.connect(context.destination);
+
+  range.oninput = () => node.setVolume(range.value / 100);
+  inmml.oninput = () => node.setMML(inmml.value);
+  range.oninput();
+  inmml.oninput();
+};
+const stop = async () => {
+  if (!context) return;
+  await context.close();
+  context = null;
+};
+
+btnstart.onclick = start;
+btnstop.onclick = stop;
+</script>
+
+<style>
+body {
+  margin: 1.5em;
+}
+.label {
+  display: inline-block;
+  width: 3.5em;
+}
+button {
+  margin-bottom: 1em;
+}
+input {
+  width: 80vw;
+}
+a {
+  color: gray !important;
+}
+</style>
