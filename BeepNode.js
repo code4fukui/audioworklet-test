@@ -12,4 +12,7 @@ export class BeepNode extends AudioWorkletNode {
   setFreq(freq) {
     this.port.postMessage({ freq });
   }
+  setFreqVolume(freq, vol) {
+    this.port.postMessage({ freq, vol });
+  }
 };
