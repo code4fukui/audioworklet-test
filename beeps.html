@@ -5,6 +5,7 @@
 
 <button id=btnstart>START</button>
 <button id=btnstop>STOP</button>
+<button id=btnrnd>RANDOM</button>
 <br>
 <span class=label>VOL</span><input type=range id=range min=0 max=100 value=10><br>
 <span class=label>FREQ</span><input type=range id=range2a min=0 max=1000 value=440 step=0.1><br>
@@ -15,6 +16,7 @@
 
 <script type="module">
 import { BeepsNode } from "./BeepsNode.js";
+import { rnd } from "https://js.sabae.cc/rnd.js";
 
 let context;
 
@@ -32,7 +34,7 @@ const start = async () => {
 
   range.oninput = () => {
     for (let i = 0; i < 3; i++) {
-      node.setVolume(i, range.value / 1000);
+      node.setVolume(i, range.value / 100);
     }
   };
   range2a.oninput = () => node.setFreq(0, range2a.value);
@@ -51,6 +53,21 @@ const stop = async () => {
 
 btnstart.onclick = start;
 btnstop.onclick = stop;
+
+// random
+let t = null;
+btnrnd.onclick = () => {
+  if (t) {
+    clearInterval(t);
+    t = null;
+  } else {
+    t = setInterval(() => {
+      const range = [range2a, range2b, range2c][rnd(3)];
+      range.value = rnd(1000);
+      range.oninput();
+    }, 1000);
+  }
+};
 </script>
 
 <style>
