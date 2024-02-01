@@ -6,6 +6,7 @@
 - [PAPU音源テスト](https://code4fukui.github.io/audioworklet-test/papu.html) with [PAPU.js](https://github.com/taisukef/jsnes/blob/master/src/papu.js) from [JSNES](https://github.com/taisukef/jsnes)
 - [IchigoJam MML](https://code4fukui.github.io/audioworklet-test/mml.html)
 - [サイン波](https://code4fukui.github.io/audioworklet-test/sine.html)
+- [風の音](https://code4fukui.github.io/audioworklet-test/wind.html) with [Wind Outside | Sound Ambient | ロイヤリティフリーの音楽 - Pixabay](https://pixabay.com/ja/sound-effects/wind-outside-sound-ambient-141989/)
 
 ## reference
 

@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Wind Sound Test with AudioWorkletProcessor</title>
+</head><body>
+<h1>Wind Sound Test with AudioWorkletProcessor</h1>
+
+<button id=btnstart>START</button>
+<button id=btnstop>STOP</button>
+<br>
+<span class=label>VOL</span><input type=range id=range min=0 max=1 value=0.1 step=0.01><br>
+<span class=label>PITCH</span><input type=range id=range2 min=0 max=2 value=1 step=0.001><br>
+<span class=label>OVERWRAP</span><input type=range id=range3 min=0 max=0.5 value=0.058 step=0.001><br>
+<hr>
+<a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
+
+<script type="module">
+import { WindNode } from "./WindNode.js";
+
+let context = null;
+
+const start = async () => {
+  if (context) {
+    await stop();
+  }
+  const sampleRate = 48000; // mac default
+  context = new AudioContext({ sampleRate });
+  console.log(context);
+
+  const node = await WindNode.create(context);
+  const fn = "./wind.wav";
+  node.setWaveFile(fn);
+
+  node.connect(context.destination);
+
+  range.oninput = () => node.setVolume(range.value);
+  range2.oninput = () => node.setPitch(range2.value);
+  range3.oninput = () => {
+    console.log(range3.value);
+    node.setOverwrap(range3.value);
+  };
+  range.oninput();
+  range2.oninput();
+  range3.oninput();
+};
+const stop = async () => {
+  if (!context) return;
+  await context.close();
+  context = null;
+};
+
+btnstart.onclick = start;
+btnstop.onclick = stop;
+</script>
+
+<style>
+body {
+  margin: 1.5em;
+}
+.label {
+  display: inline-block;
+  width: 6em;
+}
+button {
+  margin-bottom: 1em;
+}
+input {
+  width: 80vw;
+}
+a {
+  color: gray !important;
+}
+</style>
