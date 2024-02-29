@@ -9,12 +9,14 @@
 <br>
 <span class=label>VOL</span><input type=range id=range min=0 max=1 value=0.1 step=0.01><br>
 <span class=label>PITCH</span><input type=range id=range2 min=0 max=2 value=1 step=0.01><br>
+<span class=label>TEMPO</span><input type=range id=range3 min=10 max=1000 value=120 step=1><br>
 <span class=label>SAMPLE</span>
   <button id=btntone1>TONE1</button>
   <button id=btntone2>TONE2</button>
   <button id=btntone1v>TONE1v</button>
   <button id=btntone3>TONE3</button>
   <button id=btntone4>TONE3 rnd pitch</button>
+  <button id=btntone5>TONE1 with repeat</button>
   <br>
 <hr>
 <a href=https://github.com/code4fukui/audioworklet-test/>src on GitHub</a><br>
@@ -51,14 +53,26 @@ const start = async () => {
   range.oninput();
   
   let pitch = 1;
-  range2.oninput = () => pitch = range2.value;
-  range2.oninput();
 
   btntone1.onclick = () => node.noteOn(0, 1, pitch, -1);
   btntone2.onclick = () => node.noteOn(1, 1, pitch, 1);
   btntone1v.onclick = () => node.noteOn(3, 1, pitch, -1);
   btntone3.onclick = () => node.noteOn(2, 1, pitch);
   btntone4.onclick = () => node.noteOn(2, 1, Math.random() + 0.5, Math.random() * 2 - 1);
+  let tid = null;
+  btntone5.onclick = () => {
+    tid = node.noteOn(tid || 0, 1, pitch, 0, range3.value);
+  };
+  range2.oninput = () => {
+    pitch = range2.value;
+    if (tid) node.noteOn(tid, 1, pitch, 0, range3.value);
+  };
+  range2.oninput();
+
+  range3.oninput = () => {
+    if (tid) node.noteOn(tid, 1, pitch, 0, range3.value);
+  };
+  range3.oninput();
 };
 const stop = async () => {
   if (!context) return;

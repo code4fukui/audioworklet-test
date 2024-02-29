@@ -1,6 +1,7 @@
 import { WaveFile } from "https://code4fukui.github.io/wavefile-es/index.js";
 
 export const i16_to_f32 = n => (n > 32767 ? n - 65536 : n) / 32768;
+export const MAX_SAMPLES = 10000;
 
 export const toSamplesFloat = (data) => {
   const wave = new Float32Array(data.length / 2);
@@ -19,6 +20,7 @@ export class SamplesNode extends AudioWorkletNode {
   constructor(context) {
     super(context, "samples-processor");
     this.vol = 0.1;
+    this.id = MAX_SAMPLES;
   }
   setVolume(vol) {
     if (vol == this.vol) return;
@@ -39,14 +41,16 @@ export class SamplesNode extends AudioWorkletNode {
     }
     this.setSamples(samples);
   }
-  noteOn(nsample, vol = 1.0, pitch = 1.0, pan = 0) {
+  noteOn(nsample, vol = 1.0, pitch = 1.0, pan = 0, tempo = 0) {
     const mes = {
       noteOn: true,
       nsample,
       vol,
       pitch,
       pan,
+      tempo,
     };
     this.port.postMessage(mes);
+    return nsample >= MAX_SAMPLES ? nsample : this.id++;
   }
 };

@@ -1,16 +1,26 @@
+export const MAX_SAMPLES = 10000;
+
 class Tone {
-  constructor(samples, vol = 1, pitch = 1, pan = 0) {
+  constructor(id, samples, vol = 1, pitch = 1, pan = 0, tempo = 0) {
+    this.id = id;
     this.samples = samples;
+    this.p = 0;
+    this.set(vol, pitch, pan, tempo);
+  }
+  set(vol = 1, pitch = 1, pan = 0, tempo = 0) {
     this.vol = vol;
     this.pitch = pitch;
     this.pan = pan;
-    this.p = 0;
+    this.repeatlen = 60 / tempo * sampleRate * pitch;
   }
   tickSample() {
-    const n = this.p >> 0;
+    const n = this.repeatlen ? (this.p % this.repeatlen) >> 0 : this.p >> 0;
     const vol = n < this.samples.length ? this.samples[n] : 0;
     this.p += this.pitch;
     return vol;
+  }
+  isEnd() {
+    return this.repeatlen ? false : this.p >= this.samples.length;
   }
 }
 
@@ -20,6 +30,7 @@ class SamplesProcessor extends AudioWorkletProcessor {
     this.vol = 0.1;
     this.samples = [];
     this.tones = [];
+    this.id = MAX_SAMPLES;
     this.port.onmessage = e => {
       if (e.data.samples) {
         this.samples = e.data.samples;
@@ -29,17 +40,24 @@ class SamplesProcessor extends AudioWorkletProcessor {
         const vol = parseFloat(e.data.vol);
         const pitch = parseFloat(e.data.pitch);
         const pan = parseFloat(e.data.pan); // -1: left, 0: center, 1: right
+        const tempo = parseFloat(e.data.tempo);
         const nsample = parseInt(e.data.nsample);
-        const samples = this.samples[nsample];
+        if (nsample < MAX_SAMPLES) {
+          const samples = this.samples[nsample];
+          const id = this.id++;
 
-        const tone = new Tone(samples, vol, pitch, pan);
-        for (let i = 0; i < this.tones.length; i++) {
-          if (!this.tones[i]) {
-            this.tones[i] = tone;
-            return;
+          const tone = new Tone(id, samples, vol, pitch, pan, tempo);
+          for (let i = 0; i < this.tones.length; i++) {
+            if (!this.tones[i]) {
+              this.tones[i] = tone;
+              return;
+            }
           }
+          this.tones.push(tone);
+        } else {
+          const tone = this.tones.find(i => i && i.id == nsample);
+          if (tone) tone.set(vol, pitch, pan, tempo);
         }
-        this.tones.push(tone);
         return;
       }
       if (e.data.vol) {
@@ -52,7 +70,7 @@ class SamplesProcessor extends AudioWorkletProcessor {
     //console.log(outputs, parameters); // [Array([Float32Array(128))]
     const output = outputs[0];
     const chlen = output.length;
-    const len = output[0].length; // 128
+    const len = output[0].length; // 128 = 2.7msec in 48kHz
     //console.log("chlen", chlen, len); // why chlen == 1?
     if (chlen >= 2) {
       for (let i = 0; i < len; i++) {
@@ -81,7 +99,7 @@ class SamplesProcessor extends AudioWorkletProcessor {
     for (let i = 0; i < this.tones.length; i++) {
       const t = this.tones[i];
       if (!t) continue;
-      if (t.p >= t.samples.length) {
+      if (t.isEnd()) {
         this.tones[i] = null;
       }
     }
