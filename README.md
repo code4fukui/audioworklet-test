@@ -7,7 +7,7 @@
 - [IchigoJam MML](https://code4fukui.github.io/audioworklet-test/mml.html)
 - [サイン波](https://code4fukui.github.io/audioworklet-test/sine.html)
 - [風の音](https://code4fukui.github.io/audioworklet-test/wind.html) with [Wind Outside | Sound Ambient | ロイヤリティフリーの音楽 - Pixabay](https://pixabay.com/ja/sound-effects/wind-outside-sound-ambient-141989/)
-- [サンプリング音源 - クラッカーの音](https://code4fukui.github.io/audioworklet-test/samples.html) with [Sonuds by Code for FUKUI](sound-c4f/)
+- [サンプリング音源 - クラッカーの音](https://code4fukui.github.io/audioworklet-test/samples.html) with [sound-cc0 by Code for FUKUI](https://github.com/code4fukui/sound-cc0)
 
 ## reference
 
