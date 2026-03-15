@@ -1,35 +1,25 @@
-# AudioWorklet test
+# audioworklet-test
 
-- [シンプルなビープ音](https://code4fukui.github.io/audioworklet-test/beep.html)
-- [シンプルな複数のビープ音](https://code4fukui.github.io/audioworklet-test/beeps.html)
-- [シンプルなノイズ音](https://code4fukui.github.io/audioworklet-test/noise.html)
-- [PAPU音源テスト](https://code4fukui.github.io/audioworklet-test/papu.html) with [PAPU.js](https://github.com/taisukef/jsnes/blob/master/src/papu.js) from [JSNES](https://github.com/taisukef/jsnes)
-- [IchigoJam MML](https://code4fukui.github.io/audioworklet-test/mml.html)
-- [サイン波](https://code4fukui.github.io/audioworklet-test/sine.html)
-- [風の音](https://code4fukui.github.io/audioworklet-test/wind.html) with [Wind Outside | Sound Ambient | ロイヤリティフリーの音楽 - Pixabay](https://pixabay.com/ja/sound-effects/wind-outside-sound-ambient-141989/)
-- [サンプリング音源 - クラッカーの音](https://code4fukui.github.io/audioworklet-test/samples.html) with [sound-cc0 by Code for FUKUI](https://github.com/code4fukui/sound-cc0)
+This repository contains a collection of examples demonstrating the use of the AudioWorklet API to create custom audio processing nodes in the browser.
 
-## reference
+## Demo
+You can view the demos at https://code4fukui.github.io/audioworklet-test/
 
-- [AudioWorkletの導入 - Qiita](https://qiita.com/ryoyakawai/items/1160586653330ccbf4a4)
-- [[Web Audio API] AudioWorklet を 1 ファイルで書く方法 | g200kg Music & Software](https://www.g200kg.com/archives/2019/01/audioworklet-1.html)
+## Features
+- Simple beep sound
+- Multiple beep sounds
+- Simple noise sound
+- PAPU sound source test with PAPU.js from JSNES
+- IchigoJam MML playback
+- Sine wave generation
+- Wind sound with a CC0 sound sample
+- Sampling sound source - cracker sound with sound-cc0 by Code for FUKUI
 
-## doc
+## Requirements
+This project requires a modern web browser that supports the AudioWorklet API.
 
-Worker ワーカー
-- 専用ワーカー (Dedicated Worker)
-- 共有ワーカー (Shared Worker)
-- サービスワーカー (Service Worker)
-- オーディオワーカー (Audio Worker)
+## Usage
+To run the examples, simply open the corresponding HTML file in your web browser.
 
-Module or Classic
-- navigator.serviceWorker.register('/sw.js', { type: 'module' }) // module
-- navigator.serviceWorker.register('/sw.js') // classic
-
-制限
-- DOM操作不可
-- window オブジェクトの既定のメソッドやプロパティに一部制限
-- Dynamic Import不可
-
-通信
-- メッセージのシステム（postMessage）を使う
+## License
+This project is licensed under the MIT License.
