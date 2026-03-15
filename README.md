@@ -1,5 +1,7 @@
 # audioworklet-test
 
+> 日本語のREADMEはこちらです: [README.ja.md](README.ja.md)
+
 This repository contains a collection of examples demonstrating the use of the AudioWorklet API to create custom audio processing nodes in the browser.
 
 ## Demo

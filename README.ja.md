@@ -1,6 +1,6 @@
 # オーディオワークレットのテスト
 
-1〜2文で説明。WebAudioAPI の AudioWorkletの機能テスト集。
+WebAudioAPI の AudioWorkletの機能テスト集です。
 
 ## デモ
 - [シンプルなビープ音](https://code4fukui.github.io/audioworklet-test/beep.html)
