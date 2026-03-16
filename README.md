@@ -24,4 +24,4 @@ This project requires a modern web browser that supports the AudioWorklet API.
 To run the examples, simply open the corresponding HTML file in your web browser.
 
 ## License
-This project is licensed under the MIT License.
+MIT License — see [LICENSE](LICENSE).
